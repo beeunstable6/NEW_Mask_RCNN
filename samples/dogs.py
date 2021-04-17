@@ -32,6 +32,10 @@ import datetime
 import numpy as np
 import skimage.draw
 
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior() 
+
+
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../../")
 
