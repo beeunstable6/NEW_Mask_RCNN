@@ -42,6 +42,7 @@ from bayes_opt import BayesianOptimization
 ############################################################
 
 class inferenceConfig(Config):
+    NAME = 'dog'
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
     USE_MINI_MASK = False
