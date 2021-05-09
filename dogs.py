@@ -213,7 +213,7 @@ def hyper():
 
     opt.maximize(init_points=1, n_iter=2)
 
-    print('maximum: ', optimizer.max)
+    print('maximum: ', opt.max)
 
 def color_splash(image, mask):
     """Apply color splash effect.
