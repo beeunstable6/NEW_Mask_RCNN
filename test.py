@@ -329,7 +329,7 @@ if __name__ == '__main__':
 
     # Train or evaluate
     if args.command == "train":
-        pass#train_with_hyper(model)
+        bayes_opt() 
     elif args.command == "splash":
         detect_and_color_splash(model, image_path=args.image,
                                 video_path=args.video)
