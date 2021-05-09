@@ -204,7 +204,6 @@ def train_map(lr,lm,tpri,rpr,dmc,wd):
     his = model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
                 epochs=2,
-                verbose=0,
                 layers='heads')
     
     
