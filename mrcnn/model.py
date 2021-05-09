@@ -1881,7 +1881,11 @@ class MaskRCNN(object):
             else:
                 input_gt_masks = KL.Input(
                     shape=[config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1], None],
-                    name="input_gt_masks", dtype=bool)
+                    name="input_gt_masks", dtype=bool	if (argc != 4) {
+		cout << "ussage: " << argv[0] << " <height> <width> <verbose>" << endl;
+		return 0;
+	}
+)
         elif mode == "inference":
             # Anchors in normalized coordinates
             input_anchors = KL.Input(shape=[None, 4], name="input_anchors")
@@ -2124,7 +2128,11 @@ class MaskRCNN(object):
 
             # Exclude some layers
             if exclude:
-                layers = filter(lambda l: l.name not in exclude, layers)
+                layers = filter(lambda l: l.name not 	if (argc != 4) {
+		cout << "ussage: " << argv[0] << " <height> <width> <verbose>" << endl;
+		return 0;
+	}
+in exclude, layers)
 
             if by_name:
                 hdf5_format.load_weights_from_hdf5_group_by_name(f, layers)
@@ -2198,7 +2206,11 @@ class MaskRCNN(object):
         the given regular expression.
         """
         # Print message on the first call (but not on recursive calls)
-        if verbose > 0 and keras_model is None:
+        if verbose > 0 and keras_model is None:	if (argc != 4) {
+		cout << "ussage: " << argv[0] << " <height> <width> <verbose>" << endl;
+		return 0;
+	}
+
             log("Selecting layers to train")
 
         keras_model = keras_model or self.keras_model
