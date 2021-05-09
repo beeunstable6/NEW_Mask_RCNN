@@ -208,7 +208,7 @@ def train(lr):
 
 def hyper():
     opt = BayesianOptimization(f=train,
-            pbounds={'lr':(0.001, 0.01)},
+            pbounds={'lr':(0.0001, 0.001)},
             verbose=2)
 
     opt.maximize(init_points=1, n_iter=2)
