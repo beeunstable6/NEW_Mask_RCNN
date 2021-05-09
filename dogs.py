@@ -196,12 +196,13 @@ def train(lr):
     # no need to train all layers, just the heads should do it.
     print("Training network heads")
     his = model.train(dataset_train, dataset_val,
-                learning_rate=lr,
+                learning_rate=config.LEARNING_RATE,
                 epochs=1,
                 layers='heads')
     
     print(his.history['loss'])
-    loss = his.history['loss']
+    loss = np.min(his.history['loss'])
+    loss_list.append(loss)
     return 1 - loss
 
 
