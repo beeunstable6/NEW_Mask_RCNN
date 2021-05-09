@@ -160,7 +160,7 @@ class dogDataset(utils.Dataset):
             super(self.__class__, self).image_reference(image_id)
 
 
-def train():
+def train(lr):
     """Train the model."""
     # Training dataset.
     dataset_train = dogDataset()
@@ -178,11 +178,13 @@ def train():
     # no need to train all layers, just the heads should do it.
     print("Training network heads")
     his = model.train(dataset_train, dataset_val,
-                learning_rate=config.LEARNING_RATE,
+                learning_rate=config.lr,
                 epochs=1,
                 layers='heads')
     
     print(his.history['loss'])
+    loss = his.hostory['loss']
+    return 1 - loss
 
 
 def hyper():
