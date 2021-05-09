@@ -160,7 +160,7 @@ class dogDataset(utils.Dataset):
             super(self.__class__, self).image_reference(image_id)
 
 
-def train(lr,lr,tpri,rpr,dmc,wd):
+def train(lr,lm,tpri,rpr,dmc,wd):
     config = dogConfig()
     config.LEARNING_RATE = lr
     config.LEARNING_MOMENTUM = lm
