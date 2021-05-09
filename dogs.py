@@ -223,7 +223,8 @@ def train_map(lr,lm,tpri,rpr,dmc,wd):
                               r['rois'], r['class_ids'], r['scores'], r['masks'])
         APs.append(AP)
 
-    print(np.mean(APs))
+    print('mAP: ', np.mean(APs))
+    return np.mean(APs)
 
 def train(lr,lm,tpri,rpr,dmc,wd):
     config = dogConfig()
