@@ -232,9 +232,12 @@ def train_map(lr,lm,tpri,rpr,dmc,wd):
     
     
     config1 = inferenceConfig()                
-    model = modellib.MaskRCNN(mode="inference", model_dir='/logs/dog20210509T1842/mask_rcnn_dog_0001.h5', config=config1)
+    model = modellib.MaskRCNN(mode="inference", model_dir='/logs', config=config1)
 
-    image_ids = np.random.choice(dataset_val.image_id, 50)
+    weights_path = model.find_last()
+    model.load_weights(weight_path, by_name=True)
+
+    image_ids = np.random.choice(dataset_val.image_ids, 50)
     APs = get_map(image_ids)
     print('mAP: ', np.mean(APs))
     return np.mean(APs)
