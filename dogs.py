@@ -197,7 +197,7 @@ def train(lr):
     print("Training network heads")
     his = model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=1,
+                epochs=2,
                 layers='heads')
     
     print(his.history['loss'])
