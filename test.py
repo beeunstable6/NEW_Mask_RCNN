@@ -187,7 +187,7 @@ def train(model):
 
 
 def train_with_hyper(LEARNING_RATE):
-"""
+    """
     print("Weights: ", args.weights)
     print("Dataset: ", args.dataset)
     print("Logs: ", args.logs)
@@ -208,8 +208,7 @@ def train_with_hyper(LEARNING_RATE):
     model.load_weights(weights_path, by_name=True, exclude=[
             "mrcnn_class_logits", "mrcnn_bbox_fc",
             "mrcnn_bbox", "mrcnn_mask"])
-"""
-
+    """
     # Training dataset.
     dataset_train = dogDataset()
     dataset_train.load_dog(args.dataset, "train")
