@@ -191,7 +191,7 @@ def train_with_hyper(LEARNING_RATE):
     print("Dataset: ", args.dataset)
     print("Logs: ", args.logs)
 
-    confiog = dogConfig()
+    config = dogConfig()
     config.display()
 
     # create model
