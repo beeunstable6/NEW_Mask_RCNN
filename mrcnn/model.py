@@ -1881,10 +1881,7 @@ class MaskRCNN(object):
             else:
                 input_gt_masks = KL.Input(
                     shape=[config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1], None],
-                    name="input_gt_masks", dtype=bool	if (argc != 4) {
-		cout << "ussage: " << argv[0] << " <height> <width> <verbose>" << endl;
-		return 0;
-	}
+                    name="input_gt_masks", dtype=bool
 )
         elif mode == "inference":
             # Anchors in normalized coordinates
