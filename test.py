@@ -196,10 +196,7 @@ def train_with_hyper(LEARNING_RATE):
 
     # create model
     model = modellib.MaskRCNN(mode="training", config=config,
-model.load_weights(weights_path, by_name=True, exclude=[
-            "mrcnn_class_logits", "mrcnn_bbox_fc",
-            "mrcnn_bbox", "mrcnn_mask"])
-                                  model_dir=DEFAULT_LOGS_DIR)
+               model_dir=DEFAULT_LOGS_DIR)
 
     # weights
     weights_path = COCO_WEIGHTS_PATH
