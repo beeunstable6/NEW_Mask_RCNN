@@ -282,7 +282,7 @@ if __name__ == '__main__':
     print("Logs: ", args.logs)
 
     # Configurations
-    if args.command == "train":
+    if args.command == "train" or args.command == "bayes":
         config = dogConfig()
     else:
         class InferenceConfig(dogConfig):
@@ -294,7 +294,7 @@ if __name__ == '__main__':
     config.display()
 
     # Create model
-    if args.command == "train":
+    if args.command == "train" or args.command == "baeys":
         model = modellib.MaskRCNN(mode="training", config=config,
                                   model_dir=args.logs)
     else:
@@ -329,7 +329,7 @@ if __name__ == '__main__':
 
     # Train or evaluate
     if args.command == "train":
-        train_with_hyper(model)
+        pass#train_with_hyper(model)
     elif args.command == "splash":
         detect_and_color_splash(model, image_path=args.image,
                                 video_path=args.video)
