@@ -216,8 +216,7 @@ def train_map(lr,lm,tpri,rpr,dmc,wd):
     config1 = inferenceConfig()                
     model = modellib.MaskRCNN(mode="inference", model_dir=model.find_last(), config=config1)
 
-
-    image_ids = np.random.choice(dataset_val.image_ids, 50)
+    image_ids = np.random.choice(dataset_val.image_id, 50)
     APs = []
     for image_id in image_ids:
         # Load image
