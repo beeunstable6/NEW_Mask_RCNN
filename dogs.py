@@ -202,7 +202,7 @@ def train(lr):
     
     print(his.history['loss'])
     loss = np.min(his.history['loss'])
-    loss_list.append(loss)
+    #loss_list.append(loss)
     return 1 - loss
 
 
