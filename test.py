@@ -232,9 +232,8 @@ def train_with_hyper(LEARNING_RATE):
 
 def bayes_opt():
     opt = BayesianOptimization(f=train_with_hyper,
-            pbound={'LEARNING_RATE':(1e-4, 1e-2)},
-            verbose=2
-            )
+            pbounds={'LEARNING_RATE':(1e-4, 1e-2)},
+            verbose=2)
 
     opt.maximize(init_points=4, n_iter=4)
 
