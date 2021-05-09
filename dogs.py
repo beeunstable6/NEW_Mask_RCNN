@@ -160,7 +160,7 @@ class dogDataset(utils.Dataset):
             super(self.__class__, self).image_reference(image_id)
 
 
-def train(lr,lr,tpri,rpr,dmc,rtapi,wd):
+def train(lr,lr,tpri,rpr,dmc,wd):
     config = dogConfig()
     config.LEARNING_RATE = lr
     config.LEARNING_MOMENTUM = lm
@@ -169,7 +169,6 @@ def train(lr,lr,tpri,rpr,dmc,rtapi,wd):
     config.TRAIN_ROIS_PER_IMAGE = tpri
     config.ROI_POSITIVE_RATIO = rpr
     config.DETECTION_MIN_CONFIDENCE = dmc
-    config.RPN_TRAIN_ANCHORS_PER_IMAGE = rtapi
     config.WEIGHT_DECAY = wd
  
     config.display()
