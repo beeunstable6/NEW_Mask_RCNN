@@ -47,6 +47,7 @@ class inferenceConfig(Config):
     IMAGES_PER_GPU = 1
     USE_MINI_MASK = False
     DETECTION_MIN_CONFIDENCE = 0.75
+    NUM_CLASES = 1 + 1
 
 
 class dogConfig(Config):
