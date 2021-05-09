@@ -167,7 +167,7 @@ class dogDataset(utils.Dataset):
         else:
             super(self.__class__, self).image_reference(image_id)
 
-def get_map(iamge_ids):
+def get_map(image_ids):
     APs = []
     for image_id in image_ids:
         # Load image
