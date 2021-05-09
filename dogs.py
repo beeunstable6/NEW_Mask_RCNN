@@ -204,7 +204,7 @@ def train(lr,lm,tpri,rpr,dmc,wd):
     print("Training network heads")
     his = model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=200,
+                epochs=2,
                 layers='heads')
     
     print(his.history['loss'])
@@ -223,7 +223,7 @@ def hyper():
                 'wd':(0.00001, 0.001)},
             verbose=2)
 
-    opt.maximize(init_points=1, n_iter=1)
+    opt.maximize(init_points=2, n_iter=2)
 
     print('maximum: ', opt.max)
 
