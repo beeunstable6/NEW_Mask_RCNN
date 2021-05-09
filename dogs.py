@@ -51,7 +51,7 @@ class dogConfig(Config):
 
     # We use a GPU with 12GB memory, which can fit two images.
     # Adjust down if you use a smaller GPU.
-    IMAGES_PER_GPU = 2
+    IMAGES_PER_GPU = 3
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 1  # Background + dog
@@ -197,7 +197,7 @@ def train(lr):
     print("Training network heads")
     his = model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=2,
+                epochs=4,
                 layers='heads')
     
     print(his.history['loss'])
@@ -211,7 +211,7 @@ def hyper():
             pbounds={'lr':(0.0001, 0.001)},
             verbose=2)
 
-    opt.maximize(init_points=1, n_iter=2)
+    opt.maximize(init_points=1, n_iter=1)
 
     print('maximum: ', opt.max)
 
