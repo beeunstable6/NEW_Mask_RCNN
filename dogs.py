@@ -190,7 +190,7 @@ def hyper():
             pbounds={'lr':(0.01, 0.1)},
             verbose=2)
 
-    opt.macximize(init_points=1, n_iter=2)
+    opt.maximize(init_points=1, n_iter=2)
 
     print('maximum: ', optimizer.max)
 
