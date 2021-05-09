@@ -225,19 +225,19 @@ def train_with_hyper(LEARNING_RATE):
                 epochs=2,
                 layers='heads')
 
-    loss = h.history['mrcnn_mask_loss']
-    validation_list.append(np.min(loss))
+    #loss = h.history['mrcnn_mask_loss']
+    #validation_list.append(np.min(loss))
 
-    return 1.0 - loss
+    #return 1.0 - loss
 
 def bayes_opt():
     opt = BayesianOptimization(f=train_with_hyper,
             pbounds={'LEARNING_RATE':(0.01, 0.1)},
             verbose=2)
 
-    opt.maximize(init_points=4, n_iter=4)
+    #opt.maximize(init_points=4, n_iter=4)
 
-    print('maximum:', optimizer.max)
+    #print('maximum:', optimizer.max)
 
 ############################################################
 #  Training
