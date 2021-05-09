@@ -161,6 +161,24 @@ class dogDataset(utils.Dataset):
 
 
 def train(lr):
+    config = dogConfig()
+    config.LEARNING_RATE = lr
+ 
+    config.display()
+    model = modellib.MaskRCNN(mode="training", config=config,
+                                  model_dir=DEFAULT_LOGS_DIR)
+
+    weights_path = COCO_WEIGHTS_PATH
+    # Download weights file
+    if not os.path.exists(weights_path):
+        utils.download_trained_weights(weights_path)
+
+    model.load_weights(weights_path, by_name=True, exclude=[
+            "mrcnn_class_logits", "mrcnn_bbox_fc",
+            "mrcnn_bbox", "mrcnn_mask"])
+
+
+
     """Train the model."""
     # Training dataset.
     dataset_train = dogDataset()
@@ -183,13 +201,13 @@ def train(lr):
                 layers='heads')
     
     print(his.history['loss'])
-    loss = his.hostory['loss']
+    loss = his.history['loss']
     return 1 - loss
 
 
 def hyper():
     opt = BayesianOptimization(f=train,
-            pbounds={'lr':(0.01, 0.1)},
+            pbounds={'lr':(0.001, 0.01)},
             verbose=2)
 
     opt.maximize(init_points=1, n_iter=2)
@@ -313,7 +331,7 @@ if __name__ == '__main__':
     print("Logs: ", args.logs)
 
     # Configurations
-    if args.command == "train":
+    """if args.command == "train":
         config = dogConfig()
     else:
         class InferenceConfig(dogConfig):
@@ -323,6 +341,7 @@ if __name__ == '__main__':
             IMAGES_PER_GPU = 1
         config = InferenceConfig()
     config.display()
+    
 
     global model 
     # Create model
@@ -358,7 +377,7 @@ if __name__ == '__main__':
             "mrcnn_bbox", "mrcnn_mask"])
     else:
         model.load_weights(weights_path, by_name=True)
-
+    """
     # Train or evaluate
     if args.command == "train":
         hyper()
