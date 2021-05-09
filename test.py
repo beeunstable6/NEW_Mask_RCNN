@@ -221,7 +221,7 @@ def train_with_hyper(LEARNING_RATE):
 
     print("Training network heads")
     model.train(dataset_train, dataset_val,
-                learning_rate=LEARNING_RATE,
+                learning_rate=0.01,
                 epochs=2,
                 layers='heads')
 
