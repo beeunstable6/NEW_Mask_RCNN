@@ -184,7 +184,7 @@ def train():
 
 
     def hyper():
-        pass
+        train()
 
 def color_splash(image, mask):
     """Apply color splash effect.
@@ -351,7 +351,7 @@ if __name__ == '__main__':
 
     # Train or evaluate
     if args.command == "train":
-        train()
+        hyper()
     elif args.command == "splash":
         detect_and_color_splash(model, image_path=args.image,
                                 video_path=args.video)
