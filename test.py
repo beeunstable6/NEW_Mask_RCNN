@@ -187,29 +187,7 @@ def train(model):
                 layers='heads')
 
 
-def train_with_hyper(LEARNING_RATE):
-    """
-    print("Weights: ", args.weights)
-    print("Dataset: ", args.dataset)
-    print("Logs: ", args.logs)
-
-    config = dogConfig()
-    config.display()
-
-    # create model
-    model = modellib.MaskRCNN(mode="training", config=config,
-               model_dir=DEFAULT_LOGS_DIR)
-
-    # weights
-    weights_path = COCO_WEIGHTS_PATH
-    # Download weights file
-    if not os.path.exists(weights_path):
-        utils.download_trained_weights(weights_path)
-    
-    model.load_weights(weights_path, by_name=True, exclude=[
-            "mrcnn_class_logits", "mrcnn_bbox_fc",
-            "mrcnn_bbox", "mrcnn_mask"])
-    """
+def train_with_hyper(LEARNING_RATE): 
     # Training dataset.
     dataset_train = dogDataset()
     dataset_train.load_dog(args.dataset, "train")
@@ -232,7 +210,8 @@ def train_with_hyper(LEARNING_RATE):
     #return 1.0 - loss
 
 def bayes_opt():
-    train_with_hyper(0.01)
+    train(model)
+    #train_with_hyper(0.01)
     #opt = BayesianOptimization(f=train_with_hyper,
       #      pbounds={'LEARNING_RATE':(0.01, 0.1)},
      #       verbose=2)
