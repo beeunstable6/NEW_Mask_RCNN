@@ -236,6 +236,7 @@ def train_map(lr,lm,tpri,rpr,dmc,wd):
     model = modellib.MaskRCNN(mode="inference", model_dir='/logs', config=config1)
 
     weights_path = model.find_last()
+    print('weights: ', weights_path)
     model.load_weights(weights_path, by_name=True)
 
     image_ids = np.random.choice(dataset_val.image_ids, 50)
