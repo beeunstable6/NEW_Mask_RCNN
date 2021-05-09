@@ -221,7 +221,7 @@ def train_map(lr,lm,tpri,rpr,dmc,wd):
         # Load image
         image, image_meta, gt_class_id, gt_bbox, gt_mask =\
             modellib.load_image_gt(dataset_val, config,
-                                   image_id, use_mini_mask=False)
+                                   image_id)
         # Run object detection
         results = model.detect([image], verbose=0)
         # Compute AP
