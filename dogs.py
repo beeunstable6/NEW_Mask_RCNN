@@ -183,8 +183,8 @@ def train():
     print(his.history['loss'])
 
 
-    def hyper():
-        train()
+def hyper():
+    train()
 
 def color_splash(image, mask):
     """Apply color splash effect.
