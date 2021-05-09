@@ -231,7 +231,7 @@ def train_with_hyper(LEARNING_RATE):
     #return 1.0 - loss
 
 def bayes_opt():
-    train(0.01)
+    train_with_hyper(0.01)
     #opt = BayesianOptimization(f=train_with_hyper,
       #      pbounds={'LEARNING_RATE':(0.01, 0.1)},
      #       verbose=2)
