@@ -181,8 +181,29 @@ def train(model):
                 layers='heads')
 
 
-def train_with_hyper(model, epochs, lr):
-    """Train the model."""
+def train_with_hyper(LEARNING_RATE):
+    print("Weights: ", args.weights)
+    print("Dataset: ", args.dataset)
+    print("Logs: ", args.logs)
+
+    confiog = dogConfig()
+    config.display()
+
+    # create model
+    model = modellib.MaskRCNN(mode="training", config=config,
+                                  model_dir=DEFAULT_LOGS_DIR)
+
+    # weights
+    weights_path = COCO_WEIGHTS_PATH
+        # Download weights file
+        if not os.path.exists(weights_path):
+            utils.download_trained_weights(weights_path)
+    
+    model.load_weights(weights_path, by_name=True, exclude=[
+            "mrcnn_class_logits", "mrcnn_bbox_fc",
+            "mrcnn_bbox", "mrcnn_mask"])
+
+
     # Training dataset.
     dataset_train = dogDataset()
     dataset_train.load_dog(args.dataset, "train")
@@ -193,15 +214,26 @@ def train_with_hyper(model, epochs, lr):
     dataset_val.load_dog(args.dataset, "val")
     dataset_val.prepare()
 
-    # *** This training schedule is an example. Update to your needs ***
-    # Since we're using a very small dataset, and starting from
-    # COCO trained weights, we don't need to train too long. Also,
-    # no need to train all layers, just the heads should do it.
     print("Training network heads")
-    model.train(dataset_train, dataset_val,
-                learning_rate=lr,
-                epochs=epochs,
+    h = model.train(dataset_train, dataset_val,
+                learning_rate=LEARNING_RATE,
+                epochs=2,
                 layers='heads')
+    
+    loss = h.history['mrcnn_mask_loss']
+    validation_list.append(np.min(loss))
+
+    return 1.0 - loss
+
+def bayes_opt():
+    opt = BayesianOptimization(f=train_with_hyper,
+            pbound={'LEARNING_RATE':(1e-4, 1e-2)}
+            verbose=2
+            )
+
+    opt.maximize(init_points=4, n_iter=4)
+
+    print('maximum:', optimizer.max)
 
 ############################################################
 #  Training
@@ -233,6 +265,10 @@ if __name__ == '__main__':
                         metavar="path or URL to video",
                         help='Video to apply the color splash effect on')
     args = parser.parse_args()
+
+    if args.command == 'bayes':
+        bayes_opt()
+        pass
 
     # Validate arguments
     if args.command == "train":
@@ -293,7 +329,7 @@ if __name__ == '__main__':
 
     # Train or evaluate
     if args.command == "train":
-        train(model)
+        train_with_hyper(model)
     elif args.command == "splash":
         detect_and_color_splash(model, image_path=args.image,
                                 video_path=args.video)
