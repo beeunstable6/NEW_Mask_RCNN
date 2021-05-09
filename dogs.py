@@ -35,6 +35,8 @@ COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 # through the command line argument --logs
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 
+from bayes_opt import BayesianOptimization
+
 ############################################################
 #  Configurations
 ############################################################
@@ -184,7 +186,13 @@ def train():
 
 
 def hyper():
-    train()
+    opt = BayesianOptimization(f=train,
+            pbounds={'lr':(0.01, 0.1)},
+            verbose=2)
+
+    opt.macximize(init_points=1, n_iter=2)
+
+    print('maximum: ', optimizer.max)
 
 def color_splash(image, mask):
     """Apply color splash effect.
