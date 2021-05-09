@@ -232,7 +232,7 @@ def train_with_hyper(LEARNING_RATE):
 
 def bayes_opt():
     opt = BayesianOptimization(f=train_with_hyper,
-            pbound={'LEARNING_RATE':(1e-4, 1e-2)}
+            pbound={'LEARNING_RATE':(1e-4, 1e-2)},
             verbose=2
             )
 
