@@ -221,7 +221,7 @@ def train_with_hyper(LEARNING_RATE):
 
     print("Training network heads")
     h = model.train(dataset_train, dataset_val,
-                learning_rate=0.01,
+                learning_rate=LEARNING_RATE,
                 epochs=2,
                 layers='heads')
 
@@ -232,7 +232,7 @@ def train_with_hyper(LEARNING_RATE):
 
 def bayes_opt():
     opt = BayesianOptimization(f=train_with_hyper,
-            pbounds={'LEARNING_RATE':(1e-4, 1e-2)},
+            pbounds={'LEARNING_RATE':(0.01, 0.1)},
             verbose=2)
 
     opt.maximize(init_points=4, n_iter=4)
