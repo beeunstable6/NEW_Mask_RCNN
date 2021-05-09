@@ -163,8 +163,8 @@ def train_map(lr,lm,tpri,rpr,dmc,wd):
     config = dogConfig()
     config.LEARNING_RATE = lr
     config.LEARNING_MOMENTUM = lm
-    config.STEPS_PER_EPOCH = 800  # pastovus
-    config.VALIDATION_STEPS = 200 # dydziai
+    config.STEPS_PER_EPOCH = 100  # pastovus
+    config.VALIDATION_STEPS = 50 # dydziai
     config.TRAIN_ROIS_PER_IMAGE = int(tpri)
     config.ROI_POSITIVE_RATIO = rpr
     config.DETECTION_MIN_CONFIDENCE = dmc
@@ -204,6 +204,7 @@ def train_map(lr,lm,tpri,rpr,dmc,wd):
     his = model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
                 epochs=2,
+                verbose=0,
                 layers='heads')
     
     
