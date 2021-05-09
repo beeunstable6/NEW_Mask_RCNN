@@ -158,7 +158,7 @@ class dogDataset(utils.Dataset):
             super(self.__class__, self).image_reference(image_id)
 
 
-def train(model):
+def train():
     """Train the model."""
     # Training dataset.
     dataset_train = dogDataset()
@@ -182,6 +182,9 @@ def train(model):
     
     print(his.history['loss'])
 
+
+    def hyper():
+        pass
 
 def color_splash(image, mask):
     """Apply color splash effect.
@@ -311,6 +314,7 @@ if __name__ == '__main__':
         config = InferenceConfig()
     config.display()
 
+    global model = None
     # Create model
     if args.command == "train":
         model = modellib.MaskRCNN(mode="training", config=config,
