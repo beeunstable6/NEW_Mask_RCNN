@@ -187,6 +187,7 @@ def train(model):
 
 
 def train_with_hyper(LEARNING_RATE):
+"""
     print("Weights: ", args.weights)
     print("Dataset: ", args.dataset)
     print("Logs: ", args.logs)
@@ -207,7 +208,7 @@ def train_with_hyper(LEARNING_RATE):
     model.load_weights(weights_path, by_name=True, exclude=[
             "mrcnn_class_logits", "mrcnn_bbox_fc",
             "mrcnn_bbox", "mrcnn_mask"])
-
+"""
 
     # Training dataset.
     dataset_train = dogDataset()
@@ -269,10 +270,6 @@ if __name__ == '__main__':
                         metavar="path or URL to video",
                         help='Video to apply the color splash effect on')
     args = parser.parse_args()
-
-    if args.command == "bayes":
-        bayes_opt()
-        pass
 
     # Validate arguments
     if args.command == "train":
@@ -337,6 +334,8 @@ if __name__ == '__main__':
     elif args.command == "splash":
         detect_and_color_splash(model, image_path=args.image,
                                 video_path=args.video)
+    elif args.command == "bayes":
+        bayes_opt()
     else:
         print("'{}' is not recognized. "
               "Use 'train' or 'splash'".format(args.command))
