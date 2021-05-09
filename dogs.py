@@ -160,9 +160,17 @@ class dogDataset(utils.Dataset):
             super(self.__class__, self).image_reference(image_id)
 
 
-def train(lr):
+def train(lr,lr,tpri,rpr,dmc,rtapi,wd):
     config = dogConfig()
     config.LEARNING_RATE = lr
+    config.LEARNING_MOMENTUM = lm
+    config.STEPS_PER_EPOCH = 800  # pastovus
+    config.VALIDATION_STEPS = 200 # dydziai
+    config.TRAIN_ROIS_PER_IMAGE = tpri
+    config.ROI_POSITIVE_RATIO = rpr
+    config.DETECTION_MIN_CONFIDENCE = dmc
+    config.RPN_TRAIN_ANCHORS_PER_IMAGE = rtapi
+    config.WEIGHT_DECAY = wd
  
     config.display()
     model = modellib.MaskRCNN(mode="training", config=config,
@@ -197,7 +205,7 @@ def train(lr):
     print("Training network heads")
     his = model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=4,
+                epochs=200,
                 layers='heads')
     
     print(his.history['loss'])
@@ -208,7 +216,12 @@ def train(lr):
 
 def hyper():
     opt = BayesianOptimization(f=train,
-            pbounds={'lr':(0.0001, 0.001)},
+            pbounds={'lr':(0.0001, 0.001),
+                'lm':(0.75, 0.95),
+                'tpri':(10, 150),
+                'rpr':(0.25, 0.75),
+                'dmc':(0.6, 0.9),
+                'wd':(0.00001, 0.001)},
             verbose=2)
 
     opt.maximize(init_points=1, n_iter=1)
