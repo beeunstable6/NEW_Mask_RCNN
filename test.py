@@ -137,7 +137,8 @@ class dogDataset(utils.Dataset):
             return super(self.__class__, self).load_mask(image_id)
 
         # Convert polygons to a bitmap mask of shape
-        # [height, width, instance_count]model.load_weights(weights_path, by_name=True, exclude=[
+        # [height, width, instance_count]
+        model.load_weights(weights_path, by_name=True, exclude=[
             "mrcnn_class_logits", "mrcnn_bbox_fc",
             "mrcnn_bbox", "mrcnn_mask"])
 
