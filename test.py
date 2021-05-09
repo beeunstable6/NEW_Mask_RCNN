@@ -181,6 +181,28 @@ def train(model):
                 layers='heads')
 
 
+def train_with_hyper(model, epochs, lr):
+    """Train the model."""
+    # Training dataset.
+    dataset_train = dogDataset()
+    dataset_train.load_dog(args.dataset, "train")
+    dataset_train.prepare()
+
+    # Validation dataset
+    dataset_val = dogDataset()
+    dataset_val.load_dog(args.dataset, "val")
+    dataset_val.prepare()
+
+    # *** This training schedule is an example. Update to your needs ***
+    # Since we're using a very small dataset, and starting from
+    # COCO trained weights, we don't need to train too long. Also,
+    # no need to train all layers, just the heads should do it.
+    print("Training network heads")
+    model.train(dataset_train, dataset_val,
+                learning_rate=lr,
+                epochs=epochs,
+                layers='heads')
+
 ############################################################
 #  Training
 ############################################################
