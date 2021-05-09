@@ -41,6 +41,12 @@ from bayes_opt import BayesianOptimization
 #  Configurations
 ############################################################
 
+class inferenceConfig(Config):
+    GPU_COUNT = 1
+    IMAGES_PER_GPU = 1
+    USE_MINI_MASK = False
+    DETECTION_MIN_CONFIDENCE = 0.75
+
 
 class dogConfig(Config):
     """Configuration for training on the toy  dataset.
@@ -207,12 +213,8 @@ def train_map(lr,lm,tpri,rpr,dmc,wd):
                 layers='heads')
     
     
-    config = dogConfig()
-    config.GPU_COUNT = 1
-    config.IMAGES_PER_GPU = 1
-    config.DETECTION_MIN_CONFIDENCE = 0.5
-                
-    model = modellib.MaskRCNN(mode="inference", model_dir=DEFAULT_LOGS_DIR, config=config)
+    config1 = inferenceConfig()                
+    model = modellib.MaskRCNN(mode="inference", model_dir=model.find_last(), config=config1)
 
 
     image_ids = np.random.choice(dataset_val.image_ids, 50)
