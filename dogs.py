@@ -165,6 +165,24 @@ class dogDataset(utils.Dataset):
         else:
             super(self.__class__, self).image_reference(image_id)
 
+def get_map(iamge_ids):
+    APs = []
+    for image_id in image_ids:
+        # Load image
+        image, image_meta, gt_class_id, gt_bbox, gt_mask =\
+            modellib.load_image_gt(dataset_val, config,
+                                   image_id)
+        # Run object detection
+        results = model.detect([image], verbose=0)
+        # Compute AP
+        r = results[0]
+        AP, precisions, recalls, overlaps =\
+            utils.compute_ap(gt_bbox, gt_class_id, gt_mask,
+                              r['rois'], r['class_ids'], r['scores'], r['masks'])
+        APs.append(AP)
+    return APs
+
+
 def train_map(lr,lm,tpri,rpr,dmc,wd):
     config = dogConfig()
     config.LEARNING_RATE = lr
@@ -214,24 +232,10 @@ def train_map(lr,lm,tpri,rpr,dmc,wd):
     
     
     config1 = inferenceConfig()                
-    model = modellib.MaskRCNN(mode="inference", model_dir=model.find_last(), config=config1)
+    model = modellib.MaskRCNN(mode="inference", model_dir='/logs/dog20210509T1842/mask_rcnn_dog_0001.h5', config=config1)
 
     image_ids = np.random.choice(dataset_val.image_id, 50)
-    APs = []
-    for image_id in image_ids:
-        # Load image
-        image, image_meta, gt_class_id, gt_bbox, gt_mask =\
-            modellib.load_image_gt(dataset_val, config,
-                                   image_id)
-        # Run object detection
-        results = model.detect([image], verbose=0)
-        # Compute AP
-        r = results[0]
-        AP, precisions, recalls, overlaps =\
-            utils.compute_ap(gt_bbox, gt_class_id, gt_mask,
-                              r['rois'], r['class_ids'], r['scores'], r['masks'])
-        APs.append(AP)
-
+    APs = get_map(image_ids)
     print('mAP: ', np.mean(APs))
     return np.mean(APs)
 
