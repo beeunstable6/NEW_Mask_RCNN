@@ -235,7 +235,8 @@ def bayes_opt():
             pbounds={'LEARNING_RATE':(0.01, 0.1)},
             verbose=2)
 
-    #opt.maximize(init_points=4, n_iter=4)
+    opt.maximize(init_points=1, n_iter=1)
+
 
     #print('maximum:', optimizer.max)
 
