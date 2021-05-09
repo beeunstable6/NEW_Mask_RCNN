@@ -18,6 +18,7 @@ import json
 import datetime
 import numpy as np
 import skimage.draw
+from bayes_opt import BayesianOptimization 
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../../")
@@ -136,7 +137,10 @@ class dogDataset(utils.Dataset):
             return super(self.__class__, self).load_mask(image_id)
 
         # Convert polygons to a bitmap mask of shape
-        # [height, width, instance_count]
+        # [height, width, instance_count]model.load_weights(weights_path, by_name=True, exclude=[
+            "mrcnn_class_logits", "mrcnn_bbox_fc",
+            "mrcnn_bbox", "mrcnn_mask"])
+
         info = self.image_info[image_id]
         mask = np.zeros([info["height"], info["width"], len(info["polygons"])],
                         dtype=np.uint8)
@@ -191,13 +195,16 @@ def train_with_hyper(LEARNING_RATE):
 
     # create model
     model = modellib.MaskRCNN(mode="training", config=config,
+model.load_weights(weights_path, by_name=True, exclude=[
+            "mrcnn_class_logits", "mrcnn_bbox_fc",
+            "mrcnn_bbox", "mrcnn_mask"])
                                   model_dir=DEFAULT_LOGS_DIR)
 
     # weights
     weights_path = COCO_WEIGHTS_PATH
-        # Download weights file
-        if not os.path.exists(weights_path):
-            utils.download_trained_weights(weights_path)
+    # Download weights file
+    if not os.path.exists(weights_path):
+        utils.download_trained_weights(weights_path)
     
     model.load_weights(weights_path, by_name=True, exclude=[
             "mrcnn_class_logits", "mrcnn_bbox_fc",
@@ -266,7 +273,7 @@ if __name__ == '__main__':
                         help='Video to apply the color splash effect on')
     args = parser.parse_args()
 
-    if args.command == 'bayes':
+    if args.command == "bayes":
         bayes_opt()
         pass
 
