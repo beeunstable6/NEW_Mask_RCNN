@@ -220,15 +220,15 @@ def train_with_hyper(LEARNING_RATE):
     dataset_val.prepare()
 
     print("Training network heads")
-    h = model.train(dataset_train, dataset_val,
+    model.train(dataset_train, dataset_val,
                 learning_rate=LEARNING_RATE,
                 epochs=2,
                 layers='heads')
-    
+
     loss = h.history['mrcnn_mask_loss']
     validation_list.append(np.min(loss))
 
-    return 1.0 - loss
+    return 1.0# - loss
 
 def bayes_opt():
     opt = BayesianOptimization(f=train_with_hyper,
