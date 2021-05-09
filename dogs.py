@@ -159,6 +159,71 @@ class dogDataset(utils.Dataset):
         else:
             super(self.__class__, self).image_reference(image_id)
 
+def train_map(lr,lm,tpri,rpr,dmc,wd):
+    config = dogConfig()
+    config.LEARNING_RATE = lr
+    config.LEARNING_MOMENTUM = lm
+    config.STEPS_PER_EPOCH = 800  # pastovus
+    config.VALIDATION_STEPS = 200 # dydziai
+    config.TRAIN_ROIS_PER_IMAGE = int(tpri)
+    config.ROI_POSITIVE_RATIO = rpr
+    config.DETECTION_MIN_CONFIDENCE = dmc
+    config.WEIGHT_DECAY = wd
+ 
+    config.display()
+    model = modellib.MaskRCNN(mode="training", config=config,
+                                  model_dir=DEFAULT_LOGS_DIR)
+
+    weights_path = COCO_WEIGHTS_PATH
+    # Download weights file
+    if not os.path.exists(weights_path):
+        utils.download_trained_weights(weights_path)
+
+    model.load_weights(weights_path, by_name=True, exclude=[
+            "mrcnn_class_logits", "mrcnn_bbox_fc",
+            "mrcnn_bbox", "mrcnn_mask"])
+
+
+
+    """Train the model."""
+    # Training dataset.
+    dataset_train = dogDataset()
+    dataset_train.load_dog(args.dataset, "train")
+    dataset_train.prepare()
+
+    # Validation dataset
+    dataset_val = dogDataset()
+    dataset_val.load_dog(args.dataset, "val")
+    dataset_val.prepare()
+
+    # *** This training schedule is an example. Update to your needs ***
+    # Since we're using a very small dataset, and starting from
+    # COCO trained weights, we don't need to train too long. Also,
+    # no need to train all layers, just the heads should do it.
+    print("Training network heads")
+    his = model.train(dataset_train, dataset_val,
+                learning_rate=config.LEARNING_RATE,
+                epochs=2,
+                layers='heads')
+    
+    
+    image_ids = np.random.choice(dataset_val.image_ids, 50)
+    APs = []
+    for image_id in image_ids:
+        # Load image
+        image, image_meta, gt_class_id, gt_bbox, gt_mask =\
+            modellib.load_image_gt(dataset, config,
+                                   image_id, use_mini_mask=False)
+        # Run object detection
+        results = model.detect([image], verbose=0)
+        # Compute AP
+        r = results[0]
+        AP, precisions, recalls, overlaps =\
+            utils.compute_ap(gt_bbox, gt_class_id, gt_mask,
+                              r['rois'], r['class_ids'], r['scores'], r['masks'])
+        APs.append(AP)
+
+    print(np.mean(APs))
 
 def train(lr,lm,tpri,rpr,dmc,wd):
     config = dogConfig()
@@ -166,7 +231,7 @@ def train(lr,lm,tpri,rpr,dmc,wd):
     config.LEARNING_MOMENTUM = lm
     config.STEPS_PER_EPOCH = 800  # pastovus
     config.VALIDATION_STEPS = 200 # dydziai
-    config.TRAIN_ROIS_PER_IMAGE = tpri
+    config.TRAIN_ROIS_PER_IMAGE = int(tpri)
     config.ROI_POSITIVE_RATIO = rpr
     config.DETECTION_MIN_CONFIDENCE = dmc
     config.WEIGHT_DECAY = wd
@@ -225,7 +290,7 @@ def hyper():
 
     opt.maximize(init_points=2, n_iter=2)
 
-    print('maximum: ', opt.max)
+    print('maximum: ', 1 - opt.max)
 
 def color_splash(image, mask):
     """Apply color splash effect.
