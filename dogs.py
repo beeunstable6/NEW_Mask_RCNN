@@ -279,7 +279,7 @@ def train(lr,lm,tpri,rpr,dmc,wd):
 
 
 def hyper():
-    opt = BayesianOptimization(f=train,
+    opt = BayesianOptimization(f=train_map,
             pbounds={'lr':(0.0001, 0.001),
                 'lm':(0.75, 0.95),
                 'tpri':(10, 150),
