@@ -231,12 +231,13 @@ def train_with_hyper(LEARNING_RATE):
     #return 1.0 - loss
 
 def bayes_opt():
-    opt = BayesianOptimization(f=train_with_hyper,
-            pbounds={'LEARNING_RATE':(0.01, 0.1)},
-            verbose=2)
+    train(0.01)
+    #opt = BayesianOptimization(f=train_with_hyper,
+      #      pbounds={'LEARNING_RATE':(0.01, 0.1)},
+     #       verbose=2)
 
-    opt.maximize(init_points=1, n_iter=1)
-
+    #opt.maximize(init_points=1, n_iter=1)
+    
 
     #print('maximum:', optimizer.max)
 
