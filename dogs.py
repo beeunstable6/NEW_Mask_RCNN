@@ -203,7 +203,7 @@ def train_map(lr,lm,tpri,rpr,dmc,wd):
     print("Training network heads")
     his = model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=2,
+                epochs=1,
                 layers='heads')
     
     
@@ -212,7 +212,7 @@ def train_map(lr,lm,tpri,rpr,dmc,wd):
     config.IMAGES_PER_GPU = 1
     config.DETECTION_MIN_CONFIDENCE = 0.5
                 
-    model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR,config=config)
+    model = modellib.MaskRCNN(mode="inference", model_dir=DEFAULT_LOGS_DIR, config=config)
 
 
     image_ids = np.random.choice(dataset_val.image_ids, 50)
@@ -278,7 +278,7 @@ def train(lr,lm,tpri,rpr,dmc,wd):
     print("Training network heads")
     his = model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=1,
+                epochs=2,
                 layers='heads')
     
     print(his.history['loss'])
