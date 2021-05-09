@@ -62,6 +62,7 @@ class dogConfig(Config):
     DETECTION_MIN_CONFIDENCE = 0.9
 
     LEARNING_RATE = 0.001
+    TRAIN_ROIS_PER_IMAGE = 20
 
 ############################################################
 #  Dataset
@@ -220,7 +221,7 @@ def train_with_hyper(LEARNING_RATE):
     dataset_val.prepare()
 
     print("Training network heads")
-    h = model.train(dataset_train, dataset_val,
+    model.train(dataset_train, dataset_val,
                 learning_rate=LEARNING_RATE,
                 epochs=2,
                 layers='heads')
