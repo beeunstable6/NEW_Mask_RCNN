@@ -167,7 +167,7 @@ class dogDataset(utils.Dataset):
         else:
             super(self.__class__, self).image_reference(image_id)
 
-def get_map(image_ids):
+def get_map(image_ids, dataset_val, config):
     APs = []
     for image_id in image_ids:
         # Load image
@@ -241,7 +241,7 @@ def train_map(lr,lm,tpri,rpr,dmc,wd):
     model.load_weights(weights_path, by_name=True)
 
     image_ids = np.random.choice(dataset_val.image_ids, 50)
-    APs = get_map(image_ids)
+    APs = get_map(image_ids, dataset_val, config1)
     print('mAP: ', np.mean(APs))
     return np.mean(APs)
 
