@@ -207,12 +207,20 @@ def train_map(lr,lm,tpri,rpr,dmc,wd):
                 layers='heads')
     
     
+    config = dogConfig()
+    config.GPU_COUNT = 1
+    config.IMAGES_PER_GPU = 1
+    config.DETECTION_MIN_CONFIDENCE = 0.5
+                
+    model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR,config=config)
+
+
     image_ids = np.random.choice(dataset_val.image_ids, 50)
     APs = []
     for image_id in image_ids:
         # Load image
         image, image_meta, gt_class_id, gt_bbox, gt_mask =\
-            modellib.load_image_gt(dataset, config,
+            modellib.load_image_gt(dataset_val, config,
                                    image_id, use_mini_mask=False)
         # Run object detection
         results = model.detect([image], verbose=0)
