@@ -314,7 +314,7 @@ if __name__ == '__main__':
         config = InferenceConfig()
     config.display()
 
-    global model = None
+    global model 
     # Create model
     if args.command == "train":
         model = modellib.MaskRCNN(mode="training", config=config,
