@@ -249,8 +249,8 @@ def train(lr,lm,tpri,rpr,dmc,wd):
     config = dogConfig()
     config.LEARNING_RATE = lr
     config.LEARNING_MOMENTUM = lm
-    config.STEPS_PER_EPOCH = 400  # pastovus
-    config.VALIDATION_STEPS = 50 # dydziai
+    config.STEPS_PER_EPOCH = 41  # pastovus
+    config.VALIDATION_STEPS = 10 # dydziai
     config.TRAIN_ROIS_PER_IMAGE = int(tpri)
     config.ROI_POSITIVE_RATIO = rpr
     config.DETECTION_MIN_CONFIDENCE = dmc
