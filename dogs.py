@@ -36,6 +36,9 @@ COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 
 from bayes_opt import BayesianOptimization
+from bayes_opt.logger import JSONLogger
+from bayes_opt.event import Events
+from bayes_opt.util import load_logs
 
 ############################################################
 #  Configurations
@@ -289,7 +292,7 @@ def train(lr,lm,tpri,rpr,dmc,wd):
     print("Training network heads")
     his = model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=2,
+                epochs=100,
                 layers='heads')
     
     print(his.history['loss'])
@@ -307,9 +310,12 @@ def hyper():
                 'dmc':(0.6, 0.9),
                 'wd':(0.00001, 0.001)},
             verbose=2)
-
+    
+    logger = JSONLogger(path="./bo_logs.json")
+    opt.subscribe(Events.OPTIMIZATION_STEP, logger)
+    
     opt.maximize(init_points=2, n_iter=2)
-
+    load_logs(new_optimizer, logs=["./bo_logs.json"]);
     print('maximum: ', opt.max)
 
 def color_splash(image, mask):
