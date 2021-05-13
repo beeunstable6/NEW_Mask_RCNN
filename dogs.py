@@ -315,7 +315,7 @@ def hyper():
     opt.subscribe(Events.OPTIMIZATION_STEP, logger)
     
     opt.maximize(init_points=2, n_iter=2)
-    load_logs(new_optimizer, logs=["./bo_logs.json"]);
+    load_logs(opt, logs=["./bo_logs.json"]);
     print('maximum: ', opt.max)
 
 def color_splash(image, mask):
