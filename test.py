@@ -18,7 +18,6 @@ import json
 import datetime
 import numpy as np
 import skimage.draw
-from bayes_opt import BayesianOptimization 
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../../")
@@ -36,9 +35,22 @@ COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 # through the command line argument --logs
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 
+from bayes_opt import BayesianOptimization
+from bayes_opt.logger import JSONLogger
+from bayes_opt.event import Events
+from bayes_opt.util import load_logs
+
 ############################################################
 #  Configurations
 ############################################################
+
+class inferenceConfig(Config):
+    NAME = 'dog'
+    GPU_COUNT = 1
+    IMAGES_PER_GPU = 1
+    USE_MINI_MASK = False
+    DETECTION_MIN_CONFIDENCE = 0.75
+    NUM_CLASSES = 1 + 1
 
 
 class dogConfig(Config):
@@ -50,19 +62,18 @@ class dogConfig(Config):
 
     # We use a GPU with 12GB memory, which can fit two images.
     # Adjust down if you use a smaller GPU.
-    IMAGES_PER_GPU = 2
+    IMAGES_PER_GPU = 1
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 1  # Background + dog
 
     # Number of training steps per epoch
-    STEPS_PER_EPOCH = 200
+    STEPS_PER_EPOCH = 180
 
     # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
 
     LEARNING_RATE = 0.001
-    TRAIN_ROIS_PER_IMAGE = 20
 
 ############################################################
 #  Dataset
@@ -139,10 +150,6 @@ class dogDataset(utils.Dataset):
 
         # Convert polygons to a bitmap mask of shape
         # [height, width, instance_count]
-        model.load_weights(weights_path, by_name=True, exclude=[
-            "mrcnn_class_logits", "mrcnn_bbox_fc",
-            "mrcnn_bbox", "mrcnn_mask"])
-
         info = self.image_info[image_id]
         mask = np.zeros([info["height"], info["width"], len(info["polygons"])],
                         dtype=np.uint8)
@@ -163,8 +170,50 @@ class dogDataset(utils.Dataset):
         else:
             super(self.__class__, self).image_reference(image_id)
 
+def get_map(image_ids, dataset_val, config, model):
+    APs = []
+    for image_id in image_ids:
+        # Load image
+        image, image_meta, gt_class_id, gt_bbox, gt_mask =\
+            modellib.load_image_gt(dataset_val, config,
+                                   image_id)
+        # Run object detection
+        results = model.detect([image], verbose=0)
+        # Compute AP
+        r = results[0]
+        AP, precisions, recalls, overlaps =\
+            utils.compute_ap(gt_bbox, gt_class_id, gt_mask,
+                              r['rois'], r['class_ids'], r['scores'], r['masks'])
+        APs.append(AP)
+    return APs
 
-def train(model):
+
+def train_map(lr,lm,tpri,rpr,dmc,wd):
+    config = dogConfig()
+    config.LEARNING_RATE = lr
+    config.LEARNING_MOMENTUM = lm
+    config.STEPS_PER_EPOCH = 100  # pastovus
+    config.VALIDATION_STEPS = 50 # dydziai
+    config.TRAIN_ROIS_PER_IMAGE = int(tpri)
+    config.ROI_POSITIVE_RATIO = rpr
+    config.DETECTION_MIN_CONFIDENCE = dmc
+    config.WEIGHT_DECAY = wd
+ 
+    config.display()
+    model = modellib.MaskRCNN(mode="training", config=config,
+                                  model_dir=DEFAULT_LOGS_DIR)
+
+    weights_path = COCO_WEIGHTS_PATH
+    # Download weights file
+    if not os.path.exists(weights_path):
+        utils.download_trained_weights(weights_path)
+
+    model.load_weights(weights_path, by_name=True, exclude=[
+            "mrcnn_class_logits", "mrcnn_bbox_fc",
+            "mrcnn_bbox", "mrcnn_mask"])
+
+
+
     """Train the model."""
     # Training dataset.
     dataset_train = dogDataset()
@@ -181,13 +230,48 @@ def train(model):
     # COCO trained weights, we don't need to train too long. Also,
     # no need to train all layers, just the heads should do it.
     print("Training network heads")
-    model.train(dataset_train, dataset_val,
+    his = model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=2,
+                epochs=1,
                 layers='heads')
+    
+    
+    config1 = inferenceConfig()                
+    model = modellib.MaskRCNN(mode="inference", model_dir='/logs', config=config1)
+
+    weights_path = model.find_last()
+    print('weights: ', weights_path)
+    model.load_weights(weights_path, by_name=True)
+
+    image_ids = np.random.choice(dataset_val.image_ids, 50)
+    APs = get_map(image_ids, dataset_val, config1, model)
+    print('mAP: ', np.mean(APs))
+    return np.mean(APs)
+
+def train(lr,lm,tpri,rpr,dmc,wd):
+    config = dogConfig()
+    config.LEARNING_RATE = lr
+    config.LEARNING_MOMENTUM = lm
+    config.STEPS_PER_EPOCH = 400  # pastovus
+    config.VALIDATION_STEPS = 100 # dydziai
+    config.TRAIN_ROIS_PER_IMAGE = int(tpri)
+    config.ROI_POSITIVE_RATIO = rpr
+    config.DETECTION_MIN_CONFIDENCE = dmc
+    config.WEIGHT_DECAY = wd
+ 
+    config.display()
+    model = modellib.MaskRCNN(mode="training", config=config,
+                                  model_dir=DEFAULT_LOGS_DIR)
+
+    weights_path = model.get_imagenet_weights()
+
+    model.load_weights(weights_path, by_name=True, exclude=[
+            "mrcnn_class_logits", "mrcnn_bbox_fc",
+            "mrcnn_bbox", "mrcnn_mask"])
 
 
-def train_with_hyper(LEARNING_RATE): 
+
+    """Train the model."""
     # Training dataset.
     dataset_train = dogDataset()
     dataset_train.load_dog(args.dataset, "train")
@@ -198,28 +282,112 @@ def train_with_hyper(LEARNING_RATE):
     dataset_val.load_dog(args.dataset, "val")
     dataset_val.prepare()
 
+    # *** This training schedule is an example. Update to your needs ***
+    # Since we're using a very small dataset, and starting from
+    # COCO trained weights, we don't need to train too long. Also,
+    # no need to train all layers, just the heads should do it.
     print("Training network heads")
-    model.train(dataset_train, dataset_val,
-                learning_rate=LEARNING_RATE,
-                epochs=2,
+    his = model.train(dataset_train, dataset_val,
+                learning_rate=config.LEARNING_RATE,
+                epochs=20,
                 layers='heads')
-
-    #loss = h.history['mrcnn_mask_loss']
-    #validation_list.append(np.min(loss))
-
-    #return 1.0 - loss
-
-def bayes_opt():
-    train(model)
-    #train_with_hyper(0.01)
-    #opt = BayesianOptimization(f=train_with_hyper,
-      #      pbounds={'LEARNING_RATE':(0.01, 0.1)},
-     #       verbose=2)
-
-    #opt.maximize(init_points=1, n_iter=1)
     
+    print(his.history['loss'])
+    loss = np.min(his.history['loss'])
+    #loss_list.append(loss)
+    return 1 - loss
 
-    #print('maximum:', optimizer.max)
+
+def hyper():
+    opt = BayesianOptimization(f=train,
+            pbounds={'lr':(0.0001, 0.001),
+                'lm':(0.75, 0.95),
+                'tpri':(10, 150),
+                'rpr':(0.25, 0.75),
+                'dmc':(0.6, 0.9),
+                'wd':(0.00001, 0.001)},
+            verbose=2)
+    
+    logger = JSONLogger(path="./bo_logs.json")
+    opt.subscribe(Events.OPTIMIZATION_STEP, logger)
+    
+    opt.maximize(init_points=3, n_iter=10)
+    load_logs(opt, logs=["./bo_logs.json"]);
+    print('maximum: ', opt.max)
+
+def color_splash(image, mask):
+    """Apply color splash effect.
+    image: RGB image [height, width, 3]
+    mask: instance segmentation mask [height, width, instance count]
+    Returns result image.
+    """
+    # Make a grayscale copy of the image. The grayscale copy still
+    # has 3 RGB channels, though.
+    gray = skimage.color.gray2rgb(skimage.color.rgb2gray(image)) * 255
+    # Copy color pixels from the original color image where mask is set
+    if mask.shape[-1] > 0:
+        # We're treating all instances as one, so collapse the mask into one layer
+        mask = (np.sum(mask, -1, keepdims=True) >= 1)
+        splash = np.where(mask, image, gray).astype(np.uint8)
+    else:
+        splash = gray.astype(np.uint8)
+    return splash
+
+
+def detect_and_color_splash(model, image_path=None, video_path=None):
+    assert image_path or video_path
+
+    # Image or video?
+    if image_path:
+        class_names=['BG','dog']
+        # Run model detection and generate the color splash effect
+        print("Running on {}".format(args.image))
+        # Read image
+        image = skimage.io.imread(args.image)
+        # Detect objects
+        r = model.detect([image], verbose=1)[0]
+        # Color splash
+        #splash = color_splash(image, r['masks'])
+        # Save output
+        visualize.display_instances(image,r['rois'],r['masks'],r['class_ids'], class_names, r['scores'])
+        plt.savefig("{:%Y%m%dT%H%M%S}.png".format(datetime.datetime.now()))
+        file_name = "splash_{:%Y%m%dT%H%M%S}.png".format(datetime.datetime.now())
+        #skimage.io.imsave(file_name, splash)
+    elif video_path:
+        import cv2
+        # Video capture
+        vcapture = cv2.VideoCapture(video_path)
+        width = int(vcapture.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(vcapture.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        fps = vcapture.get(cv2.CAP_PROP_FPS)
+
+        # Define codec and create video writer
+        file_name = "splash_{:%Y%m%dT%H%M%S}.avi".format(datetime.datetime.now())
+        vwriter = cv2.VideoWriter(file_name,
+                                  cv2.VideoWriter_fourcc(*'MJPG'),
+                                  fps, (width, height))
+
+        count = 0
+        success = True
+        while success:
+            print("frame: ", count)
+            # Read next image
+            success, image = vcapture.read()
+            if success:
+                # OpenCV returns images as BGR, convert to RGB
+                image = image[..., ::-1]
+                # Detect objects
+                r = model.detect([image], verbose=0)[0]
+                # Color splash
+                splash = color_splash(image, r['masks'])
+                # RGB -> BGR to save image to video
+                splash = splash[..., ::-1]
+                # Add image to video writer
+                vwriter.write(splash)
+                count += 1
+        vwriter.release()
+    print("Saved to ", file_name)
+
 
 ############################################################
 #  Training
@@ -264,7 +432,7 @@ if __name__ == '__main__':
     print("Logs: ", args.logs)
 
     # Configurations
-    if args.command == "train" or args.command == "bayes":
+    """if args.command == "train":
         config = dogConfig()
     else:
         class InferenceConfig(dogConfig):
@@ -274,15 +442,15 @@ if __name__ == '__main__':
             IMAGES_PER_GPU = 1
         config = InferenceConfig()
     config.display()
-
+    
+    global model 
     # Create model
-    if args.command == "train" or args.command == "baeys":
+    if args.command == "train":
         model = modellib.MaskRCNN(mode="training", config=config,
                                   model_dir=args.logs)
     else:
         model = modellib.MaskRCNN(mode="inference", config=config,
                                   model_dir=args.logs)
-
     # Select weights file to load
     if args.weights.lower() == "coco":
         weights_path = COCO_WEIGHTS_PATH
@@ -297,7 +465,6 @@ if __name__ == '__main__':
         weights_path = model.get_imagenet_weights()
     else:
         weights_path = args.weights
-
     # Load weights
     print("Loading weights ", weights_path)
     if args.weights.lower() == "coco":
@@ -308,15 +475,13 @@ if __name__ == '__main__':
             "mrcnn_bbox", "mrcnn_mask"])
     else:
         model.load_weights(weights_path, by_name=True)
-
+    """
     # Train or evaluate
     if args.command == "train":
-        train(model) 
+        hyper()
     elif args.command == "splash":
         detect_and_color_splash(model, image_path=args.image,
                                 video_path=args.video)
-    elif args.command == "bayes":
-        bayes_opt()
     else:
         print("'{}' is not recognized. "
               "Use 'train' or 'splash'".format(args.command))
