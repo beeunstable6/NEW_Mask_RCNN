@@ -314,7 +314,7 @@ def hyper():
     logger = JSONLogger(path="./bo_logs.json")
     opt.subscribe(Events.OPTIMIZATION_STEP, logger)
     
-    opt.maximize(init_points=2, n_iter=2)
+    opt.maximize(init_points=3, n_iter=10)
     load_logs(opt, logs=["./bo_logs.json"]);
     print('maximum: ', opt.max)
 
