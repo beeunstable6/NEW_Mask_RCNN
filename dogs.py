@@ -292,7 +292,7 @@ def train(lr,lm,tpri,rpr,dmc,wd):
     print("Training network heads")
     his = model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=3,
+                epochs=10,
                 layers='heads')
     
     print(his.history['loss'])
@@ -314,7 +314,7 @@ def hyper():
     logger = JSONLogger(path="./bo_logs.json")
     opt.subscribe(Events.OPTIMIZATION_STEP, logger)
     
-    opt.maximize(init_points=1, n_iter=2)
+    opt.maximize(init_points=10, n_iter=10)
     load_logs(opt, logs=["./bo_logs.json"]);
     print('maximum: ', opt.max)
 
