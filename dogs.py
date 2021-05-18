@@ -302,6 +302,7 @@ def train(lr,lm,tpri,rpr,dmc,wd):
 
 
 def hyper():
+
     opt = BayesianOptimization(f=train,
             pbounds={'lr':(0.0001, 0.001),
                 'lm':(0.75, 0.95),
@@ -310,12 +311,12 @@ def hyper():
                 'dmc':(0.6, 0.9),
                 'wd':(0.00001, 0.001)},
             verbose=2)
-    
+    load_logs(opt, logs=["./bo_logs.json"]);
+
     logger = JSONLogger(path="/content/drive/MyDrive/b")
     opt.subscribe(Events.OPTIMIZATION_STEP, logger)
     
     opt.maximize(init_points=5, n_iter=10)
-    #load_logs(opt, logs=["./bo_logs.json"]);
     print('maximum: ', opt.max)
 
 def color_splash(image, mask):
