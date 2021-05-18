@@ -33,7 +33,7 @@ COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 
 # Directory to save logs and model checkpoints, if not provided
 # through the command line argument --logs
-DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
+DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "/content/drive/MyDrive/b/")
 
 from bayes_opt import BayesianOptimization
 from bayes_opt.logger import JSONLogger
@@ -311,11 +311,11 @@ def hyper():
                 'wd':(0.00001, 0.001)},
             verbose=2)
     
-    logger = JSONLogger(path="./bo_logs.json")
+    logger = JSONLogger(path="/content/drive/MyDrive/b")
     opt.subscribe(Events.OPTIMIZATION_STEP, logger)
     
-    opt.maximize(init_points=10, n_iter=10)
-    load_logs(opt, logs=["./bo_logs.json"]);
+    opt.maximize(init_points=5, n_iter=10)
+    #load_logs(opt, logs=["./bo_logs.json"]);
     print('maximum: ', opt.max)
 
 def color_splash(image, mask):
