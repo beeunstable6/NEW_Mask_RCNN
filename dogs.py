@@ -311,9 +311,9 @@ def hyper():
                 'dmc':(0.6, 0.9),
                 'wd':(0.00001, 0.001)},
             verbose=2)
-    load_logs(opt, logs=["/content/drive/MyDrive/b"]);
+    load_logs(opt, logs=["/content/drive/MyDrive/b.json"]);
 
-    logger = JSONLogger(path="/content/drive/MyDrive/b.json")
+    logger = JSONLogger(path="/content/drive/MyDrive/b")
     opt.subscribe(Events.OPTIMIZATION_STEP, logger)
     
     opt.maximize(init_points=5, n_iter=10)
