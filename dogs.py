@@ -313,7 +313,7 @@ def hyper():
             verbose=2)
     load_logs(opt, logs=["/content/drive/MyDrive/b"]);
 
-    logger = JSONLogger(path="/content/drive/MyDrive/b")
+    logger = JSONLogger(path="/content/drive/MyDrive/b.json")
     opt.subscribe(Events.OPTIMIZATION_STEP, logger)
     
     opt.maximize(init_points=5, n_iter=10)
